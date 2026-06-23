@@ -7,6 +7,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
+<!-- Early auth guard: redirect immediately if not logged in, before page renders -->
+<script>
+(function(){
+  try {
+    var raw = localStorage.getItem('sr_profile');
+    if (!raw) { window.location.replace('auth.html'); }
+    else {
+      var p = JSON.parse(raw);
+      // Validate that the profile has required fields (fullName, email, loggedIn)
+      if (!p || !p.loggedIn || !p.email) { window.location.replace('auth.html'); }
+    }
+  } catch(e) {
+    window.location.replace('auth.html');
+  }
+})();
+</script>
 </head>
 <body>
  
