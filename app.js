@@ -428,19 +428,160 @@ function addInventoryItem() {
   const existing = inventory.findIndex(
     i => i.name.toLowerCase() === name.toLowerCase()
   );
+// === REPLACE LINES 431-441 WITH THIS CODE ===
+    if (existing > -1) {
+        inventory[existing] = { ...inventory[existing], qty, threshold, cost, expiry };
+        toast(`${name} updated in inventory`, 'success');
+    } else {
+        inventory.push({
+            id: Date.now(),
+            name, category, qty, threshold, cost, expiry,
+            addedAt: new Date().toISOString()
+        });
+        toast(`${name} added to inventory`, 'success');
+    }
 
-  if (existing > -1) {
-    inventory[existing] = { ...inventory[existing], category, qty, threshold, cost, expiry };
-    toast(`${name} updated in inventory`, 'success');
-  } else {
-    inventory.push({
-      id: Date.now(),
-      name, category, qty, threshold, cost, expiry,
-      addedAt: new Date().toISOString()
+    // AUTOMATED EMAIL TRIGGER:
+    // Check your existing inventory array for any items that are <= 10 units
+    const lowStockItems = inventory
+        .filter(item => item.qty <= 10)
+        .map(item => ({ name: item.name, stock: item.qty }));
+
+    if (lowStockItems.length > 0) {
+        // Fetch current user and dummy/live financials for calculation
+        const userProfile = { 
+            name: document.getElementById('user-profile-name')?.innerText || "Stocknexa User", 
+            email: "client-email@example.com" // Populate with logged-in user email variable
+        };
+
+        const financialData = {
+            revenue: 15000.00,  // Pull from your actual sales data/variables if available
+            cogs: 4500.00,
+            losses: 250.00,
+            refunds: 150.00,
+            overheads: 800.00,
+            topProduct: name || "Premium Widget",
+            topProductProfit: 3200.00,
+            underProduct: "Faulty Item",
+            underProductLoss: 120.00
+        };
+
+        // Fire the template builder exactly as requested
+        sendLowStockBusinessAlert(userProfile, lowStockItems, financialData);
+    }
+ 
+// Stocknexa Automated Email Notification System
+
+/**
+ * Generates the text template and sends the low-stock alert via EmailJS
+ * @param {Object} userProfile - The logged-in user data
+ * @param {Array} lowStockProducts - Array of products with stock <= 10
+ * @param {Object} financialData - Calculated weekly financial metrics
+ */
+function sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData) {
+    // 1. Calculate Reporting Dates
+    const today = new Date();
+    const firstDay = new Date(today.setDate(today.getDate() - today.getDay() + 1)); // Monday
+    const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 7));  // Sunday
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const startDate = firstDay.toLocaleDateString('en-US', options);
+    const endDate = lastDay.toLocaleDateString('en-US', options);
+
+    // 2. Safely Build the ASCII Data Table Layout
+    let tableRows = "";
+    lowStockProducts.forEach(prod => {
+        // Pad the product name to fit perfectly inside the 25-character space
+        const namePart = `│ ${prod.name.padEnd(23, ' ')} `;
+        // Pad the units count to fit perfectly inside the 15-character space
+        const stockPart = `│ ${(prod.stock + " units").padEnd(14, ' ')}│`;
+        tableRows += namePart + stockPart + "\n";
     });
-    toast(`${name} added to inventory`, 'success');
-  }
+    // Remove the trailing newline character
+    tableRows = tableRows.trimEnd();
 
+    // 3. Format Currency Numbers to 2 Decimal Places (GHS)
+    const formatGHS = (num) => Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const revenue = formatGHS(financialData.revenue);
+    const cogs = formatGHS(financialData.cogs);
+    const netProfit = formatGHS(financialData.revenue - financialData.cogs);
+    const losses = formatGHS(financialData.losses);
+    const refunds = formatGHS(financialData.refunds);
+    const overheads = formatGHS(financialData.overheads);
+    const netLoss = formatGHS(financialData.losses + financialData.refunds + financialData.overheads);
+    
+    const overallNetNum = (financialData.revenue - financialData.cogs) - (financialData.losses + financialData.refunds + financialData.overheads);
+    const overallNetPosition = formatGHS(overallNetNum);
+    const status = overallNetNum >= 0 ? "Profitable" : "At a Loss";
+
+    // 4. Construct the Template Structure Exactly
+    const emailBody = `Dear ${userProfile.name},
+
+We hope this message finds you well. Here is your automated weekly business alert covering your inventory status and financial performance for the week of ${startDate} – ${endDate}.
+
+─────────────────────────────────
+🔴 LOW STOCK ALERT
+─────────────────────────────────
+The following products have fallen to or below the critical threshold of 10 units. Immediate restocking is recommended to avoid stockouts.
+
+┌─────────────────────────┬───────────────┐
+│ Product Name            │ Units in Stock │
+├─────────────────────────┼───────────────┤
+${tableRows}
+└─────────────────────────┴───────────────┘
+
+Please log in to your dashboard to reorder or update inventory levels.
+
+─────────────────────────────────
+📈 WEEKLY PROFIT SUMMARY
+─────────────────────────────────
+Total Revenue This Week: GHS ${revenue}
+Total Cost of Goods Sold: GHS ${cogs}
+──────────────
+Net Profit: GHS ${netProfit} ✅
+Top Performing Product: ${financialData.topProduct} — GHS ${formatGHS(financialData.topProductProfit)} in profit
+
+─────────────────────────────────
+📉 WEEKLY LOSS SUMMARY
+─────────────────────────────────
+Total Recorded Losses: GHS ${losses}
+Returns & Refunds: GHS ${refunds}
+Expenses & Overheads: GHS ${overheads}
+──────────────
+Net Loss: GHS ${netLoss} ❌
+Underperforming Product: ${financialData.underProduct} — GHS ${formatGHS(financialData.underProductLoss)} in loss
+
+─────────────────────────────────
+📊 WEEKLY OVERVIEW
+─────────────────────────────────
+Overall Net Position: GHS ${overallNetPosition}
+Status: ${status}
+
+─────────────────────────────────
+For a full breakdown, please visit your dashboard at https://stocknexaai.netlify.app/auth.html.
+
+If you have any questions or concerns, feel free to reach out to our support team at support@stocknexa.com.
+
+Best regards,
+Stocknexa Automated Alerts
+──────────────────────────────────────────
+You are receiving this email because you are a registered user of Stocknexa. To manage your notification preferences, click here: https://stocknexaai.netlify.app/auth.html`;
+
+    // 5. Send via EmailJS to protect your alerts@stocknexa.com credentials
+    // Sign up for free at emailjs.com, connect your SMTP/Gmail account, and paste keys below
+    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        to_email: userProfile.email,
+        to_name: userProfile.name,
+        message_body: emailBody
+    }, "YOUR_PUBLIC_KEY")
+    .then(() => {
+        console.log("Stocknexa notification delivered successfully!");
+    })
+    .catch((error) => {
+        console.error("Technical issue sending email:", error);
+    });
+}
   saveData(); renderInventory(); refreshDashboard(); renderAlerts(); clearInvForm();
 }
 
@@ -736,3 +877,148 @@ function esc(str) {
 //  BOOT
 // ═══════════════════════════════════════════════
 init();
+
+// ==========================================
+// PASTE THE MAIN FUNCTION HERE (At the bottom of app.js)
+// ==========================================
+function sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData) {
+    // ... (This is the long function from the previous answer)
+    // ... It handles the layout, dates, and ends with emailjs.send()
+}
+
+
+// ==========================================
+// PASTE THE EXECUTION SETUP CODE IMMEDIATELY BELOW IT
+// ==========================================
+// Place this inside the function where your app handles product sales, 
+// stock updates, or page loading. 
+function checkInventoryAndNotify() {
+    // 1. Your sample or active data arrays
+    const userProfile = { name: "Kwame Mensah", email: "kwame@mensahstores.com" };
+
+    const lowStockProducts = [
+        { name: "Product A", stock: 8 },
+        { name: "Product B", stock: 5 },
+        { name: "Product C", stock: 10 }
+    ];
+
+    const financialData = {
+        revenue: 15000.00,
+        cogs: 4500.00,
+        losses: 250.00,
+        refunds: 150.00,
+        overheads: 800.00,
+        topProduct: "Premium Widget",
+        topProductProfit: 3200.00,
+        underProduct: "Faulty Gadget",
+        underProductLoss: 400.00
+    };
+
+    // 2. The trigger logic that automatically fires the email
+    if (lowStockProducts.length > 0) {
+        sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData);
+    }
+}
+
+// Call this function whenever you want to test or run the alert system
+// checkInventoryAndNotify();
+
+// =========================================================================
+// AUTOMATED EMAIL NOTIFICATION SYSTEM (PASTE AT THE VERY END OF APP.JS)
+// =========================================================================
+function sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData) {
+    const today = new Date();
+    const firstDay = new Date(today.setDate(today.getDate() - today.getDay() + 1)); 
+    const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 7));  
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const startDate = firstDay.toLocaleDateString('en-US', options);
+    const endDate = lastDay.toLocaleDateString('en-US', options);
+
+    let tableRows = "";
+    lowStockProducts.forEach(prod => {
+        const namePart = `│ ${prod.name.padEnd(23, ' ')} `;
+        const stockPart = `│ ${(prod.stock + " units").padEnd(14, ' ')}│`;
+        tableRows += namePart + stockPart + "\n";
+    });
+    tableRows = tableRows.trimEnd();
+
+    const formatGHS = (num) => Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const revenue = formatGHS(financialData.revenue);
+    const cogs = formatGHS(financialData.cogs);
+    const netProfit = formatGHS(financialData.revenue - financialData.cogs);
+    const losses = formatGHS(financialData.losses);
+    const refunds = formatGHS(financialData.refunds);
+    const overheads = formatGHS(financialData.overheads);
+    const netLoss = formatGHS(financialData.losses + financialData.refunds + financialData.overheads);
+    
+    const overallNetNum = (financialData.revenue - financialData.cogs) - (financialData.losses + financialData.refunds + financialData.overheads);
+    const overallNetPosition = formatGHS(overallNetNum);
+    const status = overallNetNum >= 0 ? "Profitable" : "At a Loss";
+
+    const emailBody = `Dear ${userProfile.name},
+
+We hope this message finds you well. Here is your automated weekly business alert covering your inventory status and financial performance for the week of ${startDate} – ${endDate}.
+
+─────────────────────────────────
+🔴 LOW STOCK ALERT
+─────────────────────────────────
+The following products have fallen to or below the critical threshold of 10 units. Immediate restocking is recommended to avoid stockouts.
+
+┌─────────────────────────┬───────────────┐
+│ Product Name            │ Units in Stock │
+├─────────────────────────┼───────────────┤
+${tableRows}
+└─────────────────────────┴───────────────┘
+
+Please log in to your dashboard to reorder or update inventory levels.
+
+─────────────────────────────────
+📈 WEEKLY PROFIT SUMMARY
+─────────────────────────────────
+Total Revenue This Week: GHS ${revenue}
+Total Cost of Goods Sold: GHS ${cogs}
+──────────────
+Net Profit: GHS ${netProfit} ✅
+Top Performing Product: ${financialData.topProduct} — GHS ${formatGHS(financialData.topProductProfit)} in profit
+
+─────────────────────────────────
+📉 WEEKLY LOSS SUMMARY
+─────────────────────────────────
+Total Recorded Losses: GHS ${losses}
+Returns & Refunds: GHS ${refunds}
+Expenses & Overheads: GHS ${overheads}
+──────────────
+Net Loss: GHS ${netLoss} ❌
+Underperforming Product: ${financialData.underProduct} — GHS ${formatGHS(financialData.underProductLoss)} in loss
+
+─────────────────────────────────
+📊 WEEKLY OVERVIEW
+─────────────────────────────────
+Overall Net Position: GHS ${overallNetPosition}
+Status: ${status}
+
+─────────────────────────────────
+For a full breakdown, please visit your dashboard at https://stocknexaai.netlify.app/auth.html.
+
+If you have any questions or concerns, feel free to reach out to our support team at support@stocknexa.com.
+
+Best regards,
+Stocknexa Automated Alerts
+──────────────────────────────────────────
+You are receiving this email because you are a registered user of Stocknexa. To manage your notification preferences, click here: https://stocknexaai.netlify.app/auth.html`;
+
+    // Make sure to replace these placeholder strings with your actual keys from emailjs.com
+    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        to_email: userProfile.email,
+        to_name: userProfile.name,
+        message_body: emailBody
+    }, "YOUR_PUBLIC_KEY")
+    .then(() => {
+        console.log("Stocknexa notification delivered successfully!");
+    })
+    .catch((error) => {
+        console.error("Technical issue sending email:", error);
+    });
+}
