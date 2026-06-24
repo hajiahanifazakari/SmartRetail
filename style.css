@@ -983,6 +983,14 @@ tbody tr:hover {
     display: block;
   }
 
+  .logout-btn {
+  background-color: #dc3545;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+}
+
   #mobile-nav {
     display: flex;
   }

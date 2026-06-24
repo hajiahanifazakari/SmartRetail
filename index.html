@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SmartRetail — Your Pocket Business Manager</title>
+<title>Stocknexa — Your Pocket Business Manager</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
@@ -35,7 +35,7 @@
     <div class="brand-logo">
       <div class="brand-icon">🛒</div>
       <div>
-        <div class="brand-name">Smart<span>Retail</span></div>
+        <div class="brand-name">Stocknexa</div>
       </div>
     </div>
     <div class="brand-tagline">Pocket Business Manager</div>
@@ -357,8 +357,8 @@
         </div>
       </div>
       <div class="settings-group">
-        <h3>ℹ️ About SmartRetail</h3>
-        <p style="font-size:0.82rem;color:var(--muted);">SmartRetail v1.0 — Built for African entrepreneurs. All data stored locally on your device using browser localStorage. No internet required after first load.</p>
+        <h3>ℹ️ About Stocknexa</h3>
+        <p style="font-size:0.82rem;color:var(--muted);">Stocknexa v1.0 — Built for African entrepreneurs. All data stored locally on your device using browser localStorage. No internet required after first load.</p>
       </div>
     </section>
  
@@ -383,7 +383,20 @@
     <span class="m-icon">⚙️</span>Settings
   </button>
 </nav>
- 
+ <!-- MOBILE NAV -->
+<nav id="mobile-nav" aria-label="Mobile navigation">
+  <button class="mobile-nav-item active" onclick="showSection('home')">
+    <span class="m-icon">🏠</span>Home
+  </button>
+  <button class="mobile-nav-item" onclick="showSection('sale')">
+    <span class="m-icon">🛍️</span>Sale
+  </button>
+  <!-- ... other buttons ... -->
+   <button class="mobile-nav-item logout-btn" onclick="logout()">
+  <span class="m-icon">🚪</span>Logout
+</button>
+</nav>
+
 <!-- TOAST CONTAINER -->
 <div id="toast" aria-live="polite"></div>
  

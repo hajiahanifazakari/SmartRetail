@@ -712,6 +712,14 @@ function clearInvForm() {
 function filterInv(type) {
   renderInventory(type);
 }
+function logout() {
+  // Clear all stored data
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Redirect to auth page
+  window.location.href = 'auth.html';
+}
 
 // ═══════════════════════════════════════════════
 //  ALERTS
