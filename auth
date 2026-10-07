@@ -1,19 +1,29 @@
-< !DOCTYPE html><html lang="en"><head>< !-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-YQV05HL18Y"></script><script>window.dataLayer=window.dataLayer || [];
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQV05HL18Y"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
 function gtag() {
   dataLayer.push(arguments);
 }
-
 gtag('js', new Date());
-
 gtag('config', 'G-YQV05HL18Y');
-
-</script><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>SmartRetail — Get Started</title><link rel="preconnect" href="https://fonts.googleapis.com" /><link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" /><script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script><style>*,
+</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SmartRetail — Get Started</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+*,
 *::before,
 *::after {
   box-sizing: border-box;
   margin: 0;
-  padding: 0
+  padding: 0;
 }
 
 :root {
@@ -614,62 +624,263 @@ body {
     font-size: 1.1rem;
   }
 }
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <!-- BRAND -->
+    <div class="auth-brand">
+      <div class="auth-brand-icon">🛒</div>
+      <div class="auth-brand-name">Smart<span>Retail</span></div>
+      <div class="auth-brand-sub" id="auth-subtitle">Pocket Business Manager</div>
+    </div>
+    <!-- PROGRESS DOTS -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="dot active" id="dot-0"></div>
+      <div class="dot-line" id="line-0"></div>
+      <div class="dot" id="dot-1"></div>
+      <div class="dot-line" id="line-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot-line" id="line-2"></div>
+      <div class="dot" id="dot-3"></div>
+    </div>
 
-</style></head><body><div class="auth-wrap"><div class="auth-card">< !-- BRAND --><div class="auth-brand"><div class="auth-brand-icon">🛒</div><div class="auth-brand-name">Smart<span>Retail</span></div><div class="auth-brand-sub" id="auth-subtitle">Pocket Business Manager</div></div>< !-- PROGRESS DOTS --><div class="progress-wrap" id="progress-wrap"><div class="dot active" id="dot-0"></div><div class="dot-line" id="line-0"></div><div class="dot" id="dot-1"></div><div class="dot-line" id="line-1"></div><div class="dot" id="dot-2"></div><div class="dot-line" id="line-2"></div><div class="dot" id="dot-3"></div></div>< !-- ═══ STEP 0: LOGIN / REGISTER TOGGLE ═══ --><div class="step active" id="step-0"><div class="login-toggle"><button class="login-tab active" id="tab-register" onclick="switchTab('register')">New Store</button><button class="login-tab" id="tab-login" onclick="switchTab('login')">Sign In</button></div>< !-- REGISTER FORM --><div id="register-form"><div class="step-eyebrow">Step 1 of 4</div><div class="step-title">Create your account</div><div class="step-desc">Your details stay private and stored securely on this device.</div><div class="field" id="f-fullname"><label for="inp-fullname">Your Full Name *</label><input type="text" id="inp-fullname" placeholder="e.g. Abena Owusu" autocomplete="name" /><div class="field-error">Please enter your name</div></div><div class="field" id="f-email"><label for="inp-email">Email Address *</label><input type="email" id="inp-email" placeholder="e.g. abena@gmail.com" autocomplete="email" /><div class="field-error" id="email-err">Enter a valid email</div></div><div class="field" id="f-password"><label for="inp-password">Create Password *</label><div class="pw-wrap"><input type="password" id="inp-password" placeholder="Min. 6 characters" autocomplete="new-password" oninput="checkStrength()" /><button class="pw-eye" type="button" onclick="togglePw('inp-password',this)">👁</button></div><div class="strength-wrap"><div class="strength-bar-bg"><div class="strength-bar-fill" id="strength-fill"></div></div><div class="strength-text" id="strength-text"></div></div><div class="field-error">Password must be at least 6 characters</div></div><button class="btn-full btn-primary" onclick="submitStep0Register()">Continue → </button></div>< !-- LOGIN FORM --><div id="login-form" style="display:none;"><div class="step-title">Welcome back 👋</div><div class="step-desc">Sign in to your SmartRetail account.</div><div class="field" id="f-li-email"><label for="inp-li-email">Email Address</label><input type="email" id="inp-li-email" placeholder="your@email.com" autocomplete="email" /><div class="field-error">Enter a valid email</div></div><div class="field" id="f-li-password"><label for="inp-li-password">Password</label><div class="pw-wrap"><input type="password" id="inp-li-password" placeholder="Your password" autocomplete="current-password" /><button class="pw-eye" type="button" onclick="togglePw('inp-li-password',this)">👁</button></div><div class="field-error">Incorrect password</div></div><button class="btn-full btn-primary" onclick="submitLogin()">Sign In → </button><div style="text-align:center;margin-top:12px;"><button class="btn-ghost" onclick="switchTab('register')">Don't have an account? Create one</button>
- </div></div></div>< !-- ═══ STEP 1: STORE BASICS ═══ --><div class="step" id="step-1"><button class="back-btn" onclick="goBack(1)">← Back</button><div class="step-eyebrow">Step 2 of 4</div><div class="step-title">Tell us about your store</div><div class="step-desc">This helps SmartRetail customize everything for you.</div><div class="field" id="f-shopname"><label for="inp-shopname">Shop / Business Name *</label><input type="text" id="inp-shopname" placeholder="e.g. Abena's Boutique" /><div class="field-error">Please enter your shop name</div></div><div class="field"><label>Business Type *</label><div class="chip-group" id="chips-biztype"><div class="chip" onclick="selectChip(this,'biztype')">🏪 Retail Shop</div><div class="chip" onclick="selectChip(this,'biztype')">📦 Wholesale</div><div class="chip" onclick="selectChip(this,'biztype')">🛍️ Both</div><div class="chip" onclick="selectChip(this,'biztype')">🚶 Mobile / Market</div></div><div class="field-error" id="biztype-err" style="display:none;font-size:0.72rem;color:var(--coral);margin-top:6px;">Please select a business type</div></div><div class="field"><label for="inp-currency">Currency</label><select id="inp-currency"><option value="GH₵">GH₵ — Ghana Cedis</option><option value="₦">₦ — Nigerian Naira</option><option value="KES">KES — Kenyan Shilling</option><option value="R">R — South African Rand</option><option value="$">$ — US Dollar</option><option value="€">€ — Euro</option><option value="£">£ — British Pound</option></select></div><button class="btn-full btn-primary" onclick="submitStep1()">Continue →</button></div>< !-- ═══ STEP 2: WHAT YOU SELL ═══ --><div class="step" id="step-2"><button class="back-btn" onclick="goBack(2)">← Back</button><div class="step-eyebrow">Step 3 of 4</div><div class="step-title">What do you sell?</div><div class="step-desc">Select your main product categories. This personalises your dashboard labels.</div><div class="field"><label>Product Categories <span style="color:var(--muted);font-weight:400">(pick all that apply)</span></label><div class="chip-group" id="chips-categories"><div class="chip" onclick="toggleMultiChip(this)">👗 Clothing & Fashion</div><div class="chip" onclick="toggleMultiChip(this)">🍎 Food & Groceries</div><div class="chip" onclick="toggleMultiChip(this)">💄 Beauty & Cosmetics</div><div class="chip" onclick="toggleMultiChip(this)">📱 Electronics</div><div class="chip" onclick="toggleMultiChip(this)">🏠 Household Items</div><div class="chip" onclick="toggleMultiChip(this)">💊 Pharmacy</div><div class="chip" onclick="toggleMultiChip(this)">👟 Shoes & Bags</div><div class="chip" onclick="toggleMultiChip(this)">🛠️ Hardware & Tools</div><div class="chip" onclick="toggleMultiChip(this)">📚 Books & Stationery</div><div class="chip" onclick="toggleMultiChip(this)">🍳 Kitchenware</div></div><div class="field-error" id="cat-err" style="display:none;font-size:0.72rem;color:var(--coral);margin-top:6px;">Please select at least one category</div></div><div class="field"><label for="inp-other-cat">Other (optional)</label><input type="text" id="inp-other-cat" placeholder="e.g. Spare parts, Livestock..." /></div><button class="btn-full btn-primary" onclick="submitStep2()">Continue →</button></div>< !-- ═══ STEP 3: PREFERENCES ═══ --><div class="step" id="step-3"><button class="back-btn" onclick="goBack(3)">← Back</button><div class="step-eyebrow">Step 4 of 4 — Almost done !</div><div class="step-title">A few quick preferences</div><div class="step-desc">Helps us set your defaults. You can change these later.</div><div class="field"><label>Pick a Store Avatar</label><div class="avatar-grid" id="avatar-grid"><div class="avatar-opt selected" onclick="selectAvatar(this)">🏪</div><div class="avatar-opt" onclick="selectAvatar(this)">🛍️</div><div class="avatar-opt" onclick="selectAvatar(this)">🏬</div><div class="avatar-opt" onclick="selectAvatar(this)">🛒</div><div class="avatar-opt" onclick="selectAvatar(this)">💼</div><div class="avatar-opt" onclick="selectAvatar(this)">🏷️</div></div></div><div class="field"><label>Features to enable</label><div class="toggle-row on" id="tog-expiry" onclick="toggleRow(this)"><div><div class="toggle-label">⏰ Expiry Date Tracking</div><div class="toggle-sub">Get alerts before products expire</div></div><div class="toggle-pill"></div></div><div class="toggle-row on" id="tog-autodeduct" onclick="toggleRow(this)"><div><div class="toggle-label">📦 Auto Stock Deduction</div><div class="toggle-sub">Reduce inventory when a sale is recorded</div></div><div class="toggle-pill"></div></div><div class="toggle-row" id="tog-customer" onclick="toggleRow(this)"><div><div class="toggle-label">👤 Customer Name Tracking</div><div class="toggle-sub">Log customer names with each sale</div></div><div class="toggle-pill"></div></div></div><button class="btn-full btn-primary" onclick="submitStep3()">🚀 Launch My Store</button></div>< !-- ═══ STEP 4: WELCOME ═══ --><div class="step" id="step-4"><div class="welcome-wrap"><span class="welcome-icon">🎉</span><div class="welcome-title" id="welcome-name">Ready to go !</div><div class="welcome-sub" id="welcome-sub">Your store has been set up.<br/>Here's what we' ve configured for you:</div><div class="welcome-tags" id="welcome-tags"></div><button class="btn-full btn-primary" onclick="launchApp()" style="margin-top:8px;">Enter SmartRetail → </button></div></div></div>< !-- end auth-card --></div>< !-- end auth-wrap --><script> // ═══════════════════════════════════════════════
+    <!-- ═══ STEP 0: LOGIN / REGISTER TOGGLE ═══ -->
+    <div class="step active" id="step-0">
+      <div class="login-toggle">
+        <button class="login-tab active" id="tab-register" onclick="switchTab('register')">New Store</button>
+        <button class="login-tab" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      </div>
 
+      <!-- REGISTER FORM -->
+      <div id="register-form">
+        <div class="step-eyebrow">Step 1 of 4</div>
+        <div class="step-title">Create your account</div>
+        <div class="step-desc">Your details stay private and stored securely on this device.</div>
+        <div class="field" id="f-fullname">
+          <label for="inp-fullname">Your Full Name *</label>
+          <input type="text" id="inp-fullname" placeholder="e.g. Abena Owusu" autocomplete="name" />
+          <div class="field-error">Please enter your name</div>
+        </div>
+        <div class="field" id="f-email">
+          <label for="inp-email">Email Address *</label>
+          <input type="email" id="inp-email" placeholder="e.g. abena@gmail.com" autocomplete="email" />
+          <div class="field-error" id="email-err">Enter a valid email</div>
+        </div>
+        <div class="field" id="f-password">
+          <label for="inp-password">Create Password *</label>
+          <div class="pw-wrap">
+            <input type="password" id="inp-password" placeholder="Min. 6 characters" autocomplete="new-password" oninput="checkStrength()" />
+            <button class="pw-eye" type="button" onclick="togglePw('inp-password',this)">👁</button>
+          </div>
+          <div class="strength-wrap">
+            <div class="strength-bar-bg"><div class="strength-bar-fill" id="strength-fill"></div></div>
+            <div class="strength-text" id="strength-text"></div>
+          </div>
+          <div class="field-error">Password must be at least 6 characters</div>
+        </div>
+        <button class="btn-full btn-primary" onclick="submitStep0Register()">Continue →</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="login-form" style="display:none;">
+        <div class="step-title">Welcome back 👋</div>
+        <div class="step-desc">Sign in to your SmartRetail account.</div>
+        <div class="field" id="f-li-email">
+          <label for="inp-li-email">Email Address</label>
+          <input type="email" id="inp-li-email" placeholder="your@email.com" autocomplete="email" />
+          <div class="field-error">Enter a valid email</div>
+        </div>
+        <div class="field" id="f-li-password">
+          <label for="inp-li-password">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="inp-li-password" placeholder="Your password" autocomplete="current-password" />
+            <button class="pw-eye" type="button" onclick="togglePw('inp-li-password',this)">👁</button>
+          </div>
+          <div class="field-error">Incorrect password</div>
+        </div>
+        <button class="btn-full btn-primary" onclick="submitLogin()">Sign In →</button>
+        <div style="text-align:center;margin-top:12px;">
+          <button class="btn-ghost" onclick="switchTab('register')">Don't have an account? Create one</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 1: STORE BASICS ═══ -->
+    <div class="step" id="step-1">
+      <button class="back-btn" onclick="goBack(1)">← Back</button>
+      <div class="step-eyebrow">Step 2 of 4</div>
+      <div class="step-title">Tell us about your store</div>
+      <div class="step-desc">This helps SmartRetail customize everything for you.</div>
+      <div class="field" id="f-shopname">
+        <label for="inp-shopname">Shop / Business Name *</label>
+        <input type="text" id="inp-shopname" placeholder="e.g. Abena's Boutique" />
+        <div class="field-error">Please enter your shop name</div>
+      </div>
+      <div class="field">
+        <label>Business Type *</label>
+        <div class="chip-group" id="chips-biztype">
+          <div class="chip" onclick="selectChip(this,'biztype')">🏪 Retail Shop</div>
+          <div class="chip" onclick="selectChip(this,'biztype')">📦 Wholesale</div>
+          <div class="chip" onclick="selectChip(this,'biztype')">🛍️ Both</div>
+          <div class="chip" onclick="selectChip(this,'biztype')">🚶 Mobile / Market</div>
+        </div>
+        <div class="field-error" id="biztype-err" style="display:none;font-size:0.72rem;color:var(--coral);margin-top:6px;">Please select a business type</div>
+      </div>
+      <div class="field">
+        <label for="inp-currency">Currency</label>
+        <select id="inp-currency">
+          <option value="GH₵">GH₵ — Ghana Cedis</option>
+          <option value="₦">₦ — Nigerian Naira</option>
+          <option value="KES">KES — Kenyan Shilling</option>
+          <option value="R">R — South African Rand</option>
+          <option value="$">$ — US Dollar</option>
+          <option value="€">€ — Euro</option>
+          <option value="£">£ — British Pound</option>
+        </select>
+      </div>
+      <button class="btn-full btn-primary" onclick="submitStep1()">Continue →</button>
+    </div>
+
+    <!-- ═══ STEP 2: WHAT YOU SELL ═══ -->
+    <div class="step" id="step-2">
+      <button class="back-btn" onclick="goBack(2)">← Back</button>
+      <div class="step-eyebrow">Step 3 of 4</div>
+      <div class="step-title">What do you sell?</div>
+      <div class="step-desc">Select your main product categories. This personalises your dashboard labels.</div>
+      <div class="field">
+        <label>Product Categories <span style="color:var(--muted);font-weight:400">(pick all that apply)</span></label>
+        <div class="chip-group" id="chips-categories">
+          <div class="chip" onclick="toggleMultiChip(this)">👗 Clothing & Fashion</div>
+          <div class="chip" onclick="toggleMultiChip(this)">🍎 Food & Groceries</div>
+          <div class="chip" onclick="toggleMultiChip(this)">💄 Beauty & Cosmetics</div>
+          <div class="chip" onclick="toggleMultiChip(this)">📱 Electronics</div>
+          <div class="chip" onclick="toggleMultiChip(this)">🏠 Household Items</div>
+          <div class="chip" onclick="toggleMultiChip(this)">💊 Pharmacy</div>
+          <div class="chip" onclick="toggleMultiChip(this)">👟 Shoes & Bags</div>
+          <div class="chip" onclick="toggleMultiChip(this)">🛠️ Hardware & Tools</div>
+          <div class="chip" onclick="toggleMultiChip(this)">📚 Books & Stationery</div>
+          <div class="chip" onclick="toggleMultiChip(this)">🍳 Kitchenware</div>
+        </div>
+        <div class="field-error" id="cat-err" style="display:none;font-size:0.72rem;color:var(--coral);margin-top:6px;">Please select at least one category</div>
+      </div>
+      <div class="field">
+        <label for="inp-other-cat">Other (optional)</label>
+        <input type="text" id="inp-other-cat" placeholder="e.g. Spare parts, Livestock..." />
+      </div>
+      <button class="btn-full btn-primary" onclick="submitStep2()">Continue →</button>
+    </div>
+
+    <!-- ═══ STEP 3: PREFERENCES ═══ -->
+    <div class="step" id="step-3">
+      <button class="back-btn" onclick="goBack(3)">← Back</button>
+      <div class="step-eyebrow">Step 4 of 4 — Almost done !</div>
+      <div class="step-title">A few quick preferences</div>
+      <div class="step-desc">Helps us set your defaults. You can change these later.</div>
+      <div class="field">
+        <label>Pick a Store Avatar</label>
+        <div class="avatar-grid" id="avatar-grid">
+          <div class="avatar-opt selected" onclick="selectAvatar(this)">🏪</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">🛍️</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">🏬</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">🛒</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">💼</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">🏷️</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Features to enable</label>
+        <div class="toggle-row on" id="tog-expiry" onclick="toggleRow(this)">
+          <div>
+            <div class="toggle-label">⏰ Expiry Date Tracking</div>
+            <div class="toggle-sub">Get alerts before products expire</div>
+          </div>
+          <div class="toggle-pill"></div>
+        </div>
+        <div class="toggle-row on" id="tog-autodeduct" onclick="toggleRow(this)">
+          <div>
+            <div class="toggle-label">📦 Auto Stock Deduction</div>
+            <div class="toggle-sub">Reduce inventory when a sale is recorded</div>
+          </div>
+          <div class="toggle-pill"></div>
+        </div>
+        <div class="toggle-row" id="tog-customer" onclick="toggleRow(this)">
+          <div>
+            <div class="toggle-label">👤 Customer Name Tracking</div>
+            <div class="toggle-sub">Log customer names with each sale</div>
+          </div>
+          <div class="toggle-pill"></div>
+        </div>
+      </div>
+      <button class="btn-full btn-primary" onclick="submitStep3()">🚀 Launch My Store</button>
+    </div>
+
+    <!-- ═══ STEP 4: WELCOME ═══ -->
+    <div class="step" id="step-4">
+      <div class="welcome-wrap">
+        <span class="welcome-icon">🎉</span>
+        <div class="welcome-title" id="welcome-name">Ready to go !</div>
+        <div class="welcome-sub" id="welcome-sub">Your store has been set up.<br/>Here's what we've configured for you:</div>
+        <div class="welcome-tags" id="welcome-tags"></div>
+        <button class="btn-full btn-primary" onclick="launchApp()" style="margin-top:8px;">Enter SmartRetail →</button>
+      </div>
+    </div>
+  </div><!-- end auth-card -->
+</div><!-- end auth-wrap -->
+
+<script>
+// ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
-let profile= {
-  fullName: '', email:'', passwordHash:'',
-    shopName:'', bizType:'', currency:'GH₵',
-    categories:[], otherCat:'',
-    avatar:'🏪',
-    expiryTracking:true, autoDeduct:true, customerTracking:false
-}
+let profile = {
+  fullName: '', email: '', passwordHash: '',
+  shopName: '', bizType: '', currency: 'GH₵',
+  categories: [], otherCat: '',
+  avatar: '🏪',
+  expiryTracking: true, autoDeduct: true, customerTracking: false
+};
 
-;
-let currentStep=0;
-let activeTab='register';
+let currentStep = 0;
+let activeTab = 'register';
 
 // ═══════════════════════════════════════════════
 //  INIT — redirect if already logged in
 // ═══════════════════════════════════════════════
 (function() {
-    const existing=localStorage.getItem('sr_profile');
-
-    if(existing) {
-      const p=JSON.parse(existing);
-      if(p && p.loggedIn) window.location.href='index.html';
-    }
-  })();
+  const existing = localStorage.getItem('sr_profile');
+  if (existing) {
+    const p = JSON.parse(existing);
+    if (p && p.loggedIn) window.location.href = 'index.html';
+  }
+})();
 
 // ═══════════════════════════════════════════════
 //  TAB SWITCH
 // ═══════════════════════════════════════════════
 function switchTab(tab) {
-  activeTab=tab;
-  document.getElementById('register-form').style.display=tab==='register' ?'block': 'none';
-  document.getElementById('login-form').style.display=tab==='login' ?'block': 'none';
-  document.getElementById('tab-register').classList.toggle('active', tab==='register');
-  document.getElementById('tab-login').classList.toggle('active', tab==='login');
-  document.getElementById('auth-subtitle').textContent=tab==='login' ?'Welcome back': 'Pocket Business Manager';
-  document.getElementById('progress-wrap').style.display=tab==='register' ?'flex': 'none';
+  activeTab = tab;
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('auth-subtitle').textContent = tab === 'login' ? 'Welcome back' : 'Pocket Business Manager';
+  document.getElementById('progress-wrap').style.display = tab === 'register' ? 'flex' : 'none';
 }
 
 // ═══════════════════════════════════════════════
 //  PROGRESS DOTS
 // ═══════════════════════════════════════════════
 function setProgress(step) {
-  for(let i=0; i<4; i++) {
-    const dot=document.getElementById('dot-' +i);
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot-' + i);
     dot.classList.remove('active', 'done');
-    if(i < step) dot.classList.add('done');
-    else if(i===step) dot.classList.add('active');
+    if (i < step) dot.classList.add('done');
+    else if (i === step) dot.classList.add('active');
   }
 
-  for(let i=0; i<3; i++) {
-    const line=document.getElementById('line-' +i);
+  for (let i = 0; i < 3; i++) {
+    const line = document.getElementById('line-' + i);
     line.classList.toggle('done', i < step);
   }
 }
@@ -678,91 +889,64 @@ function setProgress(step) {
 //  NAVIGATION
 // ═══════════════════════════════════════════════
 function showStep(n) {
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-  document.getElementById('step-' +n).classList.add('active');
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
   setProgress(n);
-  currentStep=n;
+  currentStep = n;
   // Hide progress on welcome step
-  document.getElementById('progress-wrap').style.display=n===4?'none': 'flex';
+  document.getElementById('progress-wrap').style.display = n === 4 ? 'none' : 'flex';
 }
 
 function goBack(step) {
-  showStep(step-1);
+  showStep(step - 1);
 }
 
 // ═══════════════════════════════════════════════
 //  PASSWORD
 // ═══════════════════════════════════════════════
 function togglePw(id, btn) {
-  const inp=document.getElementById(id);
-
-  if(inp.type==='password') {
-    inp.type='text';
-    btn.textContent='🙈';
-  }
-
-  else {
-    inp.type='password';
-    btn.textContent='👁';
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
   }
 }
 
 function checkStrength() {
-  const val=document.getElementById('inp-password').value;
-  const fill=document.getElementById('strength-fill');
-  const txt=document.getElementById('strength-text');
-  let score=0;
-  if(val.length>=6) score++;
-  if(val.length>=10) score++;
-  if(/[A-Z]/.test(val)) score++;
-  if(/[0-9]/.test(val)) score++;
-  if(/[^A-Za-z0-9]/.test(val)) score++;
+  const val = document.getElementById('inp-password').value;
+  const fill = document.getElementById('strength-fill');
+  const txt = document.getElementById('strength-text');
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
 
-  const levels=[ {
-    w: '0%', c:'var(--coral)', t:''
-  }
-
-  ,
-  {
-  w: '25%', c:'var(--coral)', t:'Weak'
-}
-
-,
-{
-w: '50%', c:'var(--amber)', t:'Fair'
-}
-
-,
-{
-w: '75%', c:'var(--amber)', t:'Good'
-}
-
-,
-{
-w: '100%', c:'var(--emerald)', t:'Strong'
-}
-
-,
-{
-w: '100%', c:'var(--emerald)', t:'Very Strong'
-}
-
-];
-const l=levels[Math.min(score, 5)];
-fill.style.width=l.w;
-fill.style.background=l.c;
-txt.textContent=l.t;
-txt.style.color=l.c;
+  const levels = [
+    { w: '0%', c: 'var(--coral)', t: '' },
+    { w: '25%', c: 'var(--coral)', t: 'Weak' },
+    { w: '50%', c: 'var(--amber)', t: 'Fair' },
+    { w: '75%', c: 'var(--amber)', t: 'Good' },
+    { w: '100%', c: 'var(--emerald)', t: 'Strong' },
+    { w: '100%', c: 'var(--emerald)', t: 'Very Strong' }
+  ];
+  const l = levels[Math.min(score, 5)];
+  fill.style.width = l.w;
+  fill.style.background = l.c;
+  txt.textContent = l.t;
+  txt.style.color = l.c;
 }
 
 // Simple hash (not cryptographic — for local storage demo only)
 function simpleHash(str) {
-  let h=0;
-
-  for(let i=0; i<str.length; i++) {
-    h=(Math.imul(31, h)+str.charCodeAt(i))|0;
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
   }
-
   return h.toString(36);
 }
 
@@ -770,11 +954,7 @@ function simpleHash(str) {
 //  CHIP SELECTORS
 // ═══════════════════════════════════════════════
 function selectChip(el, group) {
-  document.querySelectorAll(`#chips-$ {
-      group
-    }
-
-    .chip`).forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll(`#chips-${group} .chip`).forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
 }
 
@@ -783,7 +963,7 @@ function toggleMultiChip(el) {
 }
 
 function selectAvatar(el) {
-  document.querySelectorAll('#avatar-grid .avatar-opt').forEach(a=>a.classList.remove('selected'));
+  document.querySelectorAll('#avatar-grid .avatar-opt').forEach(a => a.classList.remove('selected'));
   el.classList.add('selected');
 }
 
@@ -806,256 +986,190 @@ function isEmail(v) {
 //  STEP SUBMISSIONS
 // ═══════════════════════════════════════════════
 function submitStep0Register() {
-  const name=document.getElementById('inp-fullname').value.trim();
-  const email=document.getElementById('inp-email').value.trim();
-  const pw=document.getElementById('inp-password').value;
+  const name = document.getElementById('inp-fullname').value.trim();
+  const email = document.getElementById('inp-email').value.trim();
+  const pw = document.getElementById('inp-password').value;
 
-  let ok=true;
+  let ok = true;
 
-  if( !name) {
+  if (!name) {
     setError('f-fullname', true);
-    ok=false;
-  }
+    ok = false;
+  } else setError('f-fullname', false);
 
-  else setError('f-fullname', false);
-
-  if( !isEmail(email)) {
+  if (!isEmail(email)) {
     setError('f-email', true);
-    document.getElementById('email-err').textContent='Enter a valid email';
-    ok=false;
-  }
-
-  else {
+    document.getElementById('email-err').textContent = 'Enter a valid email';
+    ok = false;
+  } else {
     // Check duplicate
-    const users=JSON.parse(localStorage.getItem('sr_users')||'[]');
-
-    if(users.find(u=>u.email.toLowerCase()===email.toLowerCase())) {
+    const users = JSON.parse(localStorage.getItem('sr_users') || '[]');
+    if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
       setError('f-email', true);
-      document.getElementById('email-err').textContent='This email is already registered';
-      ok=false;
-    }
-
-    else setError('f-email', false);
+      document.getElementById('email-err').textContent = 'This email is already registered';
+      ok = false;
+    } else setError('f-email', false);
   }
 
-  if(pw.length<6) {
+  if (pw.length < 6) {
     setError('f-password', true);
-    ok=false;
-  }
+    ok = false;
+  } else setError('f-password', false);
 
-  else setError('f-password', false);
-  if( !ok) return;
+  if (!ok) return;
 
-  profile.fullName=name;
-  profile.email=email;
-  profile.passwordHash=simpleHash(pw);
+  profile.fullName = name;
+  profile.email = email;
+  profile.passwordHash = simpleHash(pw);
   showStep(1);
 }
 
 function submitLogin() {
-  const email=document.getElementById('inp-li-email').value.trim();
-  const pw=document.getElementById('inp-li-password').value;
-  let ok=true;
+  const email = document.getElementById('inp-li-email').value.trim();
+  const pw = document.getElementById('inp-li-password').value;
+  let ok = true;
 
-  if( !isEmail(email)) {
+  if (!isEmail(email)) {
     setError('f-li-email', true);
-    ok=false;
-  }
+    ok = false;
+  } else setError('f-li-email', false);
 
-  else setError('f-li-email', false);
-
-  if( !pw) {
+  if (!pw) {
     setError('f-li-password', true);
-    ok=false;
-  }
+    ok = false;
+  } else setError('f-li-password', false);
 
-  else setError('f-li-password', false);
-  if( !ok) return;
+  if (!ok) return;
 
-  const users=JSON.parse(localStorage.getItem('sr_users')||'[]');
-  const user=users.find(u=>u.email.toLowerCase()===email.toLowerCase());
+  const users = JSON.parse(localStorage.getItem('sr_users') || '[]');
+  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
 
-  if( !user || user.passwordHash !==simpleHash(pw)) {
+  if (!user || user.passwordHash !== simpleHash(pw)) {
     setError('f-li-email', true);
     setError('f-li-password', true);
-    document.querySelector('#f-li-password .field-error').textContent='Email or password is incorrect';
+    document.querySelector('#f-li-password .field-error').textContent = 'Email or password is incorrect';
     return;
   }
 
   // Log in
-  user.loggedIn=true;
+  user.loggedIn = true;
   localStorage.setItem('sr_profile', JSON.stringify(user));
 
   // Restore user's data keys
-  if(user.dataKey) {
-    const data=JSON.parse(localStorage.getItem(user.dataKey)||'{}');
-    if(data.sales) localStorage.setItem('smartretail_sales', JSON.stringify(data.sales));
-    if(data.inventory) localStorage.setItem('smartretail_inventory', JSON.stringify(data.inventory));
+  if (user.dataKey) {
+    const data = JSON.parse(localStorage.getItem(user.dataKey) || '{}');
+    if (data.sales) localStorage.setItem('smartretail_sales', JSON.stringify(data.sales));
+    if (data.inventory) localStorage.setItem('smartretail_inventory', JSON.stringify(data.inventory));
 
     localStorage.setItem('smartretail_settings', JSON.stringify({
-        storeName:user.shopName, currency:user.currency
-      }));
-}
+      storeName: user.shopName, currency: user.currency
+    }));
+  }
 
-window.location.href='index.html';
+  window.location.href = 'index.html';
 }
 
 function submitStep1() {
-  const shopName=document.getElementById('inp-shopname').value.trim();
-  const bizChip=document.querySelector('#chips-biztype .chip.selected');
+  const shopName = document.getElementById('inp-shopname').value.trim();
+  const bizChip = document.querySelector('#chips-biztype .chip.selected');
 
-  let ok=true;
+  let ok = true;
 
-  if( !shopName) {
+  if (!shopName) {
     setError('f-shopname', true);
-    ok=false;
+    ok = false;
+  } else setError('f-shopname', false);
+
+  if (!bizChip) {
+    document.getElementById('biztype-err').style.display = 'block';
+    ok = false;
+  } else {
+    document.getElementById('biztype-err').style.display = 'none';
   }
 
-  else setError('f-shopname', false);
+  if (!ok) return;
 
-  if( !bizChip) {
-    document.getElementById('biztype-err').style.display='block';
-    ok=false;
-  }
-
-  else {
-    document.getElementById('biztype-err').style.display='none';
-  }
-
-  if( !ok) return;
-
-  profile.shopName=shopName;
-  profile.bizType=bizChip.textContent.trim();
-  profile.currency=document.getElementById('inp-currency').value;
+  profile.shopName = shopName;
+  profile.bizType = bizChip.textContent.trim();
+  profile.currency = document.getElementById('inp-currency').value;
   showStep(2);
 }
 
 function submitStep2() {
-  const selected=Array.from(document.querySelectorAll('#chips-categories .chip.selected')) .map(c=>c.textContent.trim());
-  const other=document.getElementById('inp-other-cat').value.trim();
-  if(other) selected.push(other);
+  const selected = Array.from(document.querySelectorAll('#chips-categories .chip.selected')).map(c => c.textContent.trim());
+  const other = document.getElementById('inp-other-cat').value.trim();
+  if (other) selected.push(other);
 
-  if(selected.length===0) {
-    document.getElementById('cat-err').style.display='block';
+  if (selected.length === 0) {
+    document.getElementById('cat-err').style.display = 'block';
     return;
   }
 
-  document.getElementById('cat-err').style.display='none';
+  document.getElementById('cat-err').style.display = 'none';
 
-  profile.categories=selected;
-  profile.otherCat=other;
+  profile.categories = selected;
+  profile.otherCat = other;
   showStep(3);
 }
 
 function submitStep3() {
   // Avatar
-  const avatarEl=document.querySelector('#avatar-grid .avatar-opt.selected');
-  profile.avatar=avatarEl ? avatarEl.textContent.trim(): '🏪';
+  const avatarEl = document.querySelector('#avatar-grid .avatar-opt.selected');
+  profile.avatar = avatarEl ? avatarEl.textContent.trim() : '🏪';
 
   // Toggles
-  profile.expiryTracking=document.getElementById('tog-expiry').classList.contains('on');
-  profile.autoDeduct=document.getElementById('tog-autodeduct').classList.contains('on');
-  profile.customerTracking=document.getElementById('tog-customer').classList.contains('on');
+  profile.expiryTracking = document.getElementById('tog-expiry').classList.contains('on');
+  profile.autoDeduct = document.getElementById('tog-autodeduct').classList.contains('on');
+  profile.customerTracking = document.getElementById('tog-customer').classList.contains('on');
 
   // Save user to users list
-  const users=JSON.parse(localStorage.getItem('sr_users')||'[]');
-  const dataKey='sr_data_'+simpleHash(profile.email);
-  profile.dataKey=dataKey;
-  profile.loggedIn=true;
-  profile.createdAt=new Date().toISOString();
+  const users = JSON.parse(localStorage.getItem('sr_users') || '[]');
+  const dataKey = 'sr_data_' + simpleHash(profile.email);
+  profile.dataKey = dataKey;
+  profile.loggedIn = true;
+  profile.createdAt = new Date().toISOString();
 
-  users.push({
-    ...profile
-  });
-localStorage.setItem('sr_users', JSON.stringify(users));
-localStorage.setItem('sr_profile', JSON.stringify(profile));
+  users.push({ ...profile });
+  localStorage.setItem('sr_users', JSON.stringify(users));
+  localStorage.setItem('sr_profile', JSON.stringify(profile));
 
-// Set app settings
-localStorage.setItem('smartretail_settings', JSON.stringify({
+  // Set app settings
+  localStorage.setItem('smartretail_settings', JSON.stringify({
     storeName: profile.shopName,
     currency: profile.currency
   }));
 
-buildWelcome();
-showStep(4);
+  buildWelcome();
+  showStep(4);
 }
 
 // ═══════════════════════════════════════════════
 //  WELCOME SCREEN
 // ═══════════════════════════════════════════════
 function buildWelcome() {
-  const firstName=profile.fullName.split(' ')[0];
-  document.getElementById('welcome-name').textContent=`You're all set, ${firstName}! ${profile.avatar}`;
+  const firstName = profile.fullName.split(' ')[0];
+  document.getElementById('welcome-name').textContent = `You're all set, ${firstName}! ${profile.avatar}`;
 
+  document.getElementById('welcome-sub').innerHTML = `Your store is customized and ready.<br/>Here's a summary of your setup:`;
 
-  const topCats=profile.categories.slice(0, 3).map(c=> {
-      const emoji=c.split(' ')[0];
+  const tags = [
+    { label: 'Store', value: profile.shopName },
+    { label: 'Type', value: profile.bizType },
+    { label: 'Currency', value: profile.currency },
+    {
+      label: 'Selling',
+      value: profile.categories.slice(0, 2).map(c => c.split(' ').slice(1).join(' ')).join(', ') + (profile.categories.length > 2 ? ` +${profile.categories.length - 2} more` : '')
+    },
+    { label: 'Expiry Alerts', value: profile.expiryTracking ? 'On' : 'Off' },
+    { label: 'Auto Deduct', value: profile.autoDeduct ? 'On' : 'Off' }
+  ];
 
-      return `<span>$ {
-        emoji
-      }
-
-      </span> $ {
-        c.split(' ').slice(1).join(' ')
-      }
-
-      `;
-    }).join(' · ');
-
-  document.getElementById('welcome-sub').innerHTML=`Your store is customized and ready.<br/>Here's a summary of your setup:`;
-
-
-  const tags=[ {
-    label: 'Store', value: profile.shopName
-  }
-
-  ,
-  {
-  label: 'Type', value: profile.bizType
-}
-
-,
-{
-label: 'Currency', value: profile.currency
-}
-
-,
-{
-
-label:'Selling',
-value: profile.categories.slice(0, 2).map(c=>c.split(' ').slice(1).join(' ')).join(', ')+(profile.categories.length>2?` +$ {
-    profile.categories.length-2
-  }
-
-  more`:'')
-}
-
-,
-{
-label: 'Expiry Alerts', value: profile.expiryTracking?'On':'Off'
-}
-
-,
-{
-label: 'Auto Deduct', value: profile.autoDeduct?'On':'Off'
-}
-
-,
-];
-
-document.getElementById('welcome-tags').innerHTML=tags.map(t=> `<div class="welcome-tag" >$ {
-    t.label
-  }
-
-  : <span>$ {
-    t.value
-  }
-
-  </span></div>`).join('');
+  document.getElementById('welcome-tags').innerHTML = tags.map(t => `<div class="welcome-tag">${t.label}: <span>${t.value}</span></div>`).join('');
 }
 
 function launchApp() {
-  window.location.href='index.html';
+  window.location.href = 'index.html';
 }
-
-</script></body></html>
+</script>
+</body>
+</html>
