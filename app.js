@@ -1,5 +1,5 @@
 /* ============================================
-   SmartRetail — app.js
+   Stocknexa — app.js
    Pocket Business Manager for Entrepreneurs
    ============================================ */
 
@@ -10,40 +10,57 @@ let sales = [];
 let inventory = [];
 let settings = { storeName: 'My Store', currency: 'GH₵' };
 let dismissedAlerts = [];
-
-// ═══════════════════════════════════════════════
-//  AUTH GUARD
-// ═══════════════════════════════════════════════
 let userProfile = null;
 
+// ═══════════════════════════════════════════════
+//  AUTH GUARD & SESSION
+// ═══════════════════════════════════════════════
 function checkAuth() {
   const raw = localStorage.getItem('sr_profile');
-  if (!raw) { window.location.href = 'auth.html'; return false; }
-  const p = JSON.parse(raw);
-  if (!p || !p.loggedIn) { window.location.href = 'auth.html'; return false; }
-  userProfile = p;
-  return true;
+  if (!raw) {
+    window.location.href = 'auth.html';
+    return false;
+  }
+  try {
+    const p = JSON.parse(raw);
+    if (!p || !p.loggedIn || !p.email) {
+      window.location.href = 'auth.html';
+      return false;
+    }
+    userProfile = p;
+    return true;
+  } catch (e) {
+    window.location.href = 'auth.html';
+    return false;
+  }
 }
 
 function logout() {
-  if (!confirm('Sign out of SmartRetail?')) return;
-  // Save current data under the user's data key before leaving
+  if (!confirm('Sign out of Stocknexa?')) return;
+  
+  // Save current sales & inventory data under the user's data key before leaving
   if (userProfile && userProfile.dataKey) {
     const snapshot = {
-      sales:     JSON.parse(localStorage.getItem('smartretail_sales')     || '[]'),
-      inventory: JSON.parse(localStorage.getItem('smartretail_inventory') || '[]')
+      sales: sales,
+      inventory: inventory,
+      settings: settings
     };
     localStorage.setItem(userProfile.dataKey, JSON.stringify(snapshot));
   }
-  // Mark as logged out
+  
+  // Mark user as logged out in sr_profile & sr_users list
   if (userProfile) {
     userProfile.loggedIn = false;
     localStorage.setItem('sr_profile', JSON.stringify(userProfile));
-    // Update in users array too
+    
     const users = JSON.parse(localStorage.getItem('sr_users') || '[]');
-    const idx   = users.findIndex(u => u.email === userProfile.email);
-    if (idx > -1) { users[idx].loggedIn = false; localStorage.setItem('sr_users', JSON.stringify(users)); }
+    const idx = users.findIndex(u => u.email.toLowerCase() === userProfile.email.toLowerCase());
+    if (idx > -1) {
+      users[idx].loggedIn = false;
+      localStorage.setItem('sr_users', JSON.stringify(users));
+    }
   }
+  
   window.location.href = 'auth.html';
 }
 
@@ -54,16 +71,24 @@ function init() {
   if (!checkAuth()) return;
 
   const savedSettings = localStorage.getItem('smartretail_settings');
-  if (savedSettings) settings = JSON.parse(savedSettings);
+  if (savedSettings) {
+    try { settings = JSON.parse(savedSettings); } catch (e) {}
+  }
 
   const savedSales = localStorage.getItem('smartretail_sales');
-  if (savedSales) sales = JSON.parse(savedSales);
+  if (savedSales) {
+    try { sales = JSON.parse(savedSales); } catch (e) {}
+  }
 
   const savedInv = localStorage.getItem('smartretail_inventory');
-  if (savedInv) inventory = JSON.parse(savedInv);
+  if (savedInv) {
+    try { inventory = JSON.parse(savedInv); } catch (e) {}
+  }
 
   const savedDA = localStorage.getItem('smartretail_dismissed');
-  if (savedDA) dismissedAlerts = JSON.parse(savedDA);
+  if (savedDA) {
+    try { dismissedAlerts = JSON.parse(savedDA); } catch (e) {}
+  }
 
   updateDateDisplay();
   applySettings();
@@ -74,33 +99,40 @@ function init() {
 }
 
 function updateDateDisplay() {
-  const now  = new Date();
+  const now = new Date();
   const opts = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-  const str  = now.toLocaleDateString('en-GB', opts);
-  document.getElementById('header-date').textContent  = str;
-  document.getElementById('sidebar-date').textContent = str;
+  const str = now.toLocaleDateString('en-GB', opts);
+  const headerDate = document.getElementById('header-date');
+  const sidebarDate = document.getElementById('sidebar-date');
+  if (headerDate) headerDate.textContent = str;
+  if (sidebarDate) sidebarDate.textContent = str;
 }
 
 function applySettings() {
-  // Sidebar store info
-  document.getElementById('sidebar-store-name').textContent = settings.storeName;
+  const sidebarStoreName = document.getElementById('sidebar-store-name');
+  if (sidebarStoreName) sidebarStoreName.textContent = settings.storeName || 'My Store';
 
-  // Show profile info from userProfile if available
   if (userProfile) {
-    document.getElementById('sidebar-avatar').textContent    = userProfile.avatar || '🏪';
-    document.getElementById('sidebar-user-email').textContent = userProfile.email  || '';
-    // Personalised greeting using first name
-    const firstName = (userProfile.fullName || settings.storeName).split(' ')[0];
-    document.getElementById('greeting-name').textContent = firstName;
+    const avatarEl = document.getElementById('sidebar-avatar');
+    const emailEl = document.getElementById('sidebar-user-email');
+    const greetingEl = document.getElementById('greeting-name');
+    
+    if (avatarEl) avatarEl.textContent = userProfile.avatar || '🏪';
+    if (emailEl) emailEl.textContent = userProfile.email || '';
+    if (greetingEl) {
+      const firstName = (userProfile.fullName || settings.storeName || 'Boss').split(' ')[0];
+      greetingEl.textContent = firstName;
+    }
   } else {
-    document.getElementById('greeting-name').textContent = settings.storeName.split(' ')[0];
+    const greetingEl = document.getElementById('greeting-name');
+    if (greetingEl) greetingEl.textContent = (settings.storeName || 'Boss').split(' ')[0];
   }
 
-  document.getElementById('set-store-name').value = settings.storeName;
-  document.getElementById('set-currency').value   = settings.currency;
+  const setStoreNameInp = document.getElementById('set-store-name');
+  const setCurrInp = document.getElementById('set-currency');
+  if (setStoreNameInp) setStoreNameInp.value = settings.storeName || 'My Store';
+  if (setCurrInp) setCurrInp.value = settings.currency || 'GH₵';
 }
-
-// setupStore() removed — handled by auth.html onboarding flow
 
 // ═══════════════════════════════════════════════
 //  NAVIGATION
@@ -115,15 +147,27 @@ const sectionNames = {
 };
 
 function showSection(id, btn) {
+  const targetSec = document.getElementById('sec-' + id);
+  if (!targetSec) return;
+
   // Hide all sections
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('sec-' + id).classList.add('active');
+  targetSec.classList.add('active');
 
-  // Update sidebar active state
-  document.querySelectorAll('#sidebar .nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-title').textContent = sectionNames[id] || id;
+  const pageTitle = document.getElementById('page-title');
+  if (pageTitle) pageTitle.textContent = sectionNames[id] || id;
 
+  // Sidebar navigation active state
   document.querySelectorAll('#sidebar .nav-item').forEach(b => {
+    b.classList.remove('active');
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) {
+      b.classList.add('active');
+    }
+  });
+
+  // Mobile navigation active state
+  document.querySelectorAll('#mobile-nav .mobile-nav-item').forEach(b => {
+    b.classList.remove('active');
     if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) {
       b.classList.add('active');
     }
@@ -132,6 +176,7 @@ function showSection(id, btn) {
   closeSidebar();
 
   // Re-render data-dependent sections
+  if (id === 'dashboard') refreshDashboard();
   if (id === 'ledger')    renderLedger();
   if (id === 'alerts')    renderAlerts();
   if (id === 'inventory') renderInventory();
@@ -139,17 +184,21 @@ function showSection(id, btn) {
 
 function setMobileActive(btn) {
   document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('show');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  if (sidebar) sidebar.classList.toggle('open');
+  if (overlay) overlay.classList.toggle('show');
 }
 
 function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('show');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
 }
 
 // ═══════════════════════════════════════════════
@@ -164,8 +213,8 @@ function recordSale() {
   const customer = document.getElementById('s-customer').value.trim() || 'Walk-in';
 
   // Validation
-  if (!product)             { toast('Please enter a product name', 'error'); return; }
-  if (!qty || qty < 1)      { toast('Quantity must be at least 1', 'error'); return; }
+  if (!product)                { toast('Please enter a product name', 'error'); return; }
+  if (isNaN(qty) || qty < 1)   { toast('Quantity must be at least 1', 'error'); return; }
   if (isNaN(cost) || cost < 0) { toast('Enter a valid cost price', 'error'); return; }
   if (isNaN(sell) || sell < 0) { toast('Enter a valid selling price', 'error'); return; }
 
@@ -197,7 +246,7 @@ function recordSale() {
   refreshDashboard();
   renderAlerts();
 
-  const sym = settings.currency;
+  const sym = settings.currency || 'GH₵';
   toast(`Sale recorded! Revenue: ${sym}${revenue.toFixed(2)} | Profit: ${sym}${profit.toFixed(2)}`, 'success');
   showSection('dashboard', null);
 }
@@ -206,39 +255,55 @@ function updatePreview() {
   const qty  = parseFloat(document.getElementById('s-qty').value)  || 1;
   const cost = parseFloat(document.getElementById('s-cost').value) || 0;
   const sell = parseFloat(document.getElementById('s-sell').value) || 0;
-  const sym  = settings.currency;
+  const sym  = settings.currency || 'GH₵';
 
   const revenue   = sell * qty;
   const totalCost = cost * qty;
   const profit    = revenue - totalCost;
   const margin    = revenue > 0 ? (profit / revenue) * 100 : 0;
 
-  document.getElementById('prev-revenue').textContent = sym + revenue.toFixed(2);
-  document.getElementById('prev-cost').textContent    = sym + totalCost.toFixed(2);
-  document.getElementById('prev-profit').textContent  = sym + profit.toFixed(2);
-  document.getElementById('prev-profit').style.color  = profit >= 0 ? 'var(--emerald)' : 'var(--coral)';
-  document.getElementById('prev-margin').textContent  = margin.toFixed(1) + '%';
-  document.getElementById('prev-margin').style.color  = margin >= 0 ? 'var(--emerald)' : 'var(--coral)';
+  const prevRev = document.getElementById('prev-revenue');
+  const prevCost = document.getElementById('prev-cost');
+  const prevProfit = document.getElementById('prev-profit');
+  const prevMargin = document.getElementById('prev-margin');
+
+  if (prevRev) prevRev.textContent = sym + revenue.toFixed(2);
+  if (prevCost) prevCost.textContent = sym + totalCost.toFixed(2);
+  if (prevProfit) {
+    prevProfit.textContent = sym + profit.toFixed(2);
+    prevProfit.style.color = profit >= 0 ? 'var(--emerald)' : 'var(--coral)';
+  }
+  if (prevMargin) {
+    prevMargin.textContent = margin.toFixed(1) + '%';
+    prevMargin.style.color = margin >= 0 ? 'var(--emerald)' : 'var(--coral)';
+  }
+}
+
+function clearSaleForm() {
+  ['s-product', 's-qty', 's-cost', 's-sell', 's-customer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const catEl = document.getElementById('s-category');
+  if (catEl) catEl.value = 'General';
+  
+  const prevRev = document.getElementById('prev-revenue');
+  const prevCost = document.getElementById('prev-cost');
+  const prevProfit = document.getElementById('prev-profit');
+  const prevMargin = document.getElementById('prev-margin');
+  if (prevRev) prevRev.textContent = '—';
+  if (prevCost) prevCost.textContent = '—';
+  if (prevProfit) prevProfit.textContent = '—';
+  if (prevMargin) prevMargin.textContent = '—';
 }
 
 // ═══════════════════════════════════════════════
 //  DASHBOARD
 // ═══════════════════════════════════════════════
-function clearSaleForm() {
-  ['s-product', 's-qty', 's-cost', 's-sell', 's-customer'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('s-category').value = 'General';
-  document.getElementById('prev-revenue').textContent = '—';
-  document.getElementById('prev-cost').textContent    = '—';
-  document.getElementById('prev-profit').textContent  = '—';
-  document.getElementById('prev-margin').textContent  = '—';
-}
-
 function refreshDashboard() {
-  const sym         = settings.currency;
-  const totalRev    = sales.reduce((a, s) => a + s.revenue, 0);
-  const totalProfit = sales.reduce((a, s) => a + s.profit,  0);
+  const sym         = settings.currency || 'GH₵';
+  const totalRev    = sales.reduce((a, s) => a + (s.revenue || 0), 0);
+  const totalProfit = sales.reduce((a, s) => a + (s.profit || 0),  0);
   const margin      = totalRev > 0 ? (totalProfit / totalRev * 100) : 0;
   const alertCount  = getAlerts().length;
 
@@ -247,15 +312,21 @@ function refreshDashboard() {
   animateValue('dash-sales-count', sales.length);
   animateValue('dash-alerts-count', alertCount);
 
-  document.getElementById('dash-revenue-sub').textContent =
-    `From ${sales.length} sale${sales.length !== 1 ? 's' : ''}`;
-  document.getElementById('dash-profit-sub').textContent =
-    `Margin: ${margin.toFixed(1)}%`;
+  const revSub = document.getElementById('dash-revenue-sub');
+  const profSub = document.getElementById('dash-profit-sub');
+  if (revSub) revSub.textContent = `From ${sales.length} sale${sales.length !== 1 ? 's' : ''}`;
+  if (profSub) profSub.textContent = `Margin: ${margin.toFixed(1)}%`;
 
   // Alert badge in sidebar
   const badge = document.getElementById('alert-badge');
-  if (alertCount > 0) { badge.style.display = 'inline'; badge.textContent = alertCount; }
-  else                { badge.style.display = 'none'; }
+  if (badge) {
+    if (alertCount > 0) {
+      badge.style.display = 'inline';
+      badge.textContent = alertCount;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 
   renderMiniChart();
   renderRecentList();
@@ -263,6 +334,7 @@ function refreshDashboard() {
 
 function animateValue(id, val) {
   const el = document.getElementById(id);
+  if (!el) return;
   el.classList.remove('tick');
   void el.offsetWidth; // force reflow to restart animation
   el.textContent = val;
@@ -272,7 +344,9 @@ function animateValue(id, val) {
 function renderMiniChart() {
   const chart  = document.getElementById('mini-chart');
   const labels = document.getElementById('mini-chart-labels');
-  const last7  = sales.slice(0, 7).reverse();
+  if (!chart || !labels) return;
+
+  const last7 = sales.slice(0, 7).reverse();
 
   if (last7.length === 0) {
     chart.innerHTML  = '<div style="color:var(--muted);font-size:0.8rem;align-self:center;">No sales yet</div>';
@@ -280,18 +354,20 @@ function renderMiniChart() {
     return;
   }
 
-  const maxRev = Math.max(...last7.map(s => s.revenue));
+  const maxRev = Math.max(...last7.map(s => s.revenue || 0));
   chart.innerHTML  = '';
   labels.innerHTML = '';
 
+  const sym = settings.currency || 'GH₵';
+
   last7.forEach(s => {
-    const pct = maxRev > 0 ? (s.revenue / maxRev * 100) : 10;
+    const pct = maxRev > 0 ? ((s.revenue || 0) / maxRev * 100) : 10;
 
     const bar = document.createElement('div');
     bar.className    = 'bar';
-    bar.style.height = pct + '%';
-    bar.style.background = s.profit >= 0 ? 'var(--amber)' : 'var(--coral)';
-    bar.title = `${s.product}: ${settings.currency}${s.revenue.toFixed(2)}`;
+    bar.style.height = Math.max(8, pct) + '%';
+    bar.style.background = (s.profit || 0) >= 0 ? 'var(--amber)' : 'var(--coral)';
+    bar.title = `${s.product}: ${sym}${(s.revenue || 0).toFixed(2)}`;
     chart.appendChild(bar);
 
     const lbl = document.createElement('div');
@@ -299,14 +375,16 @@ function renderMiniChart() {
     lbl.style.fontSize  = '0.6rem';
     lbl.style.color     = 'var(--muted)';
     lbl.style.textAlign = 'center';
-    lbl.textContent = s.product.slice(0, 4);
+    lbl.textContent     = (s.product || '').slice(0, 4);
     labels.appendChild(lbl);
   });
 }
 
 function renderRecentList() {
-  const el  = document.getElementById('recent-list');
-  const sym = settings.currency;
+  const el = document.getElementById('recent-list');
+  if (!el) return;
+
+  const sym = settings.currency || 'GH₵';
 
   if (sales.length === 0) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">🧾</div><div class="empty-desc">No transactions yet</div></div>';
@@ -314,15 +392,16 @@ function renderRecentList() {
   }
 
   el.innerHTML = sales.slice(0, 5).map(s => {
-    const d    = new Date(s.timestamp);
+    const d    = new Date(s.timestamp || Date.now());
     const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const isProf = (s.profit || 0) >= 0;
     return `<div class="recent-item">
       <div>
         <div class="recent-name">${esc(s.product)}</div>
         <div class="recent-time">${time} · ${s.qty} unit${s.qty !== 1 ? 's' : ''}</div>
       </div>
-      <div style="color:${s.profit >= 0 ? 'var(--emerald)' : 'var(--coral)'};font-weight:600">
-        ${sym}${s.profit.toFixed(2)}
+      <div style="color:${isProf ? 'var(--emerald)' : 'var(--coral)'};font-weight:600">
+        ${sym}${(s.profit || 0).toFixed(2)}
       </div>
     </div>`;
   }).join('');
@@ -333,7 +412,9 @@ function renderRecentList() {
 // ═══════════════════════════════════════════════
 function renderLedger() {
   const tbody = document.getElementById('ledger-body');
-  const sym   = settings.currency;
+  if (!tbody) return;
+
+  const sym = settings.currency || 'GH₵';
 
   if (sales.length === 0) {
     tbody.innerHTML = `<tr><td colspan="11">
@@ -347,19 +428,20 @@ function renderLedger() {
   }
 
   tbody.innerHTML = sales.map((s, i) => {
-    const d         = new Date(s.timestamp);
+    const d         = new Date(s.timestamp || Date.now());
     const dateStr   = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
     const timeStr   = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const profClass = s.profit >= 0 ? 'badge-profit' : 'badge-loss';
+    const prof      = s.profit || 0;
+    const profClass = prof >= 0 ? 'badge-profit' : 'badge-loss';
     return `<tr>
       <td style="color:var(--muted)">${sales.length - i}</td>
       <td><strong>${esc(s.product)}</strong></td>
       <td><span style="font-size:0.72rem;color:var(--muted)">${esc(s.category)}</span></td>
       <td>${s.qty}</td>
-      <td>${sym}${s.cost.toFixed(2)}</td>
-      <td>${sym}${s.sell.toFixed(2)}</td>
-      <td style="color:var(--amber);font-weight:600">${sym}${s.revenue.toFixed(2)}</td>
-      <td><span class="badge ${profClass}">${s.profit >= 0 ? '▲' : '▼'} ${sym}${Math.abs(s.profit).toFixed(2)}</span></td>
+      <td>${sym}${(s.cost || 0).toFixed(2)}</td>
+      <td>${sym}${(s.sell || 0).toFixed(2)}</td>
+      <td style="color:var(--amber);font-weight:600">${sym}${(s.revenue || 0).toFixed(2)}</td>
+      <td><span class="badge ${profClass}">${prof >= 0 ? '▲' : '▼'} ${sym}${Math.abs(prof).toFixed(2)}</span></td>
       <td style="color:var(--muted)">${esc(s.customer)}</td>
       <td style="color:var(--muted);white-space:nowrap">${dateStr} ${timeStr}</td>
       <td><button class="btn btn-danger" onclick="deleteSale(${s.id})">✕</button></td>
@@ -369,33 +451,38 @@ function renderLedger() {
 
 function deleteSale(id) {
   sales = sales.filter(s => s.id !== id);
-  saveData(); refreshDashboard(); renderLedger(); renderAlerts();
+  saveData();
+  refreshDashboard();
+  renderLedger();
+  renderAlerts();
   toast('Sale removed', 'warn');
 }
 
 function clearAllSales() {
   if (!confirm('Delete ALL sales records? This cannot be undone.')) return;
   sales = [];
-  saveData(); refreshDashboard(); renderLedger(); renderAlerts();
+  saveData();
+  refreshDashboard();
+  renderLedger();
+  renderAlerts();
   toast('All sales cleared', 'warn');
 }
 
 function exportCSV() {
   if (sales.length === 0) { toast('No sales to export', 'error'); return; }
 
-  const sym    = settings.currency;
   const header = ['#', 'Product', 'Category', 'Qty', 'Unit Cost', 'Sell Price', 'Revenue', 'Profit', 'Customer', 'Date'].join(',');
   const rows   = sales.map((s, i) => [
     sales.length - i,
-    `"${s.product}"`,
-    `"${s.category}"`,
+    `"${(s.product || '').replace(/"/g, '""')}"`,
+    `"${(s.category || '').replace(/"/g, '""')}"`,
     s.qty,
-    s.cost.toFixed(2),
-    s.sell.toFixed(2),
-    s.revenue.toFixed(2),
-    s.profit.toFixed(2),
-    `"${s.customer}"`,
-    new Date(s.timestamp).toLocaleString()
+    (s.cost || 0).toFixed(2),
+    (s.sell || 0).toFixed(2),
+    (s.revenue || 0).toFixed(2),
+    (s.profit || 0).toFixed(2),
+    `"${(s.customer || '').replace(/"/g, '""')}"`,
+    new Date(s.timestamp || Date.now()).toLocaleString()
   ].join(','));
 
   const csv  = [header, ...rows].join('\n');
@@ -403,7 +490,7 @@ function exportCSV() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = `${settings.storeName.replace(/\s+/g, '_')}_sales.csv`;
+  a.download = `${(settings.storeName || 'Stocknexa').replace(/\s+/g, '_')}_sales.csv`;
   a.click();
   URL.revokeObjectURL(url);
   toast('CSV exported!', 'success');
@@ -420,110 +507,98 @@ function addInventoryItem() {
   const cost      = parseFloat(document.getElementById('i-cost').value) || 0;
   const expiry    = document.getElementById('i-expiry').value;
 
-  if (!name)                        { toast('Product name required', 'error'); return; }
-  if (isNaN(qty) || qty < 0)        { toast('Enter a valid quantity', 'error'); return; }
+  if (!name)                             { toast('Product name required', 'error'); return; }
+  if (isNaN(qty) || qty < 0)             { toast('Enter a valid quantity', 'error'); return; }
   if (isNaN(threshold) || threshold < 1) { toast('Low stock threshold must be at least 1', 'error'); return; }
 
-  // Update if already exists, otherwise add new
   const existing = inventory.findIndex(
     i => i.name.toLowerCase() === name.toLowerCase()
   );
-// === REPLACE LINES 431-441 WITH THIS CODE ===
-    if (existing > -1) {
-        inventory[existing] = { ...inventory[existing], qty, threshold, cost, expiry };
-        toast(`${name} updated in inventory`, 'success');
-    } else {
-        inventory.push({
-            id: Date.now(),
-            name, category, qty, threshold, cost, expiry,
-            addedAt: new Date().toISOString()
-        });
-        toast(`${name} added to inventory`, 'success');
-    }
 
-    // AUTOMATED EMAIL TRIGGER:
-    // Check your existing inventory array for any items that are <= 10 units
-    const lowStockItems = inventory
-        .filter(item => item.qty <= 10)
-        .map(item => ({ name: item.name, stock: item.qty }));
+  if (existing > -1) {
+    inventory[existing] = { ...inventory[existing], category, qty, threshold, cost, expiry };
+    toast(`${name} updated in inventory`, 'success');
+  } else {
+    inventory.push({
+      id: Date.now(),
+      name, category, qty, threshold, cost, expiry,
+      addedAt: new Date().toISOString()
+    });
+    toast(`${name} added to inventory`, 'success');
+  }
 
-    if (lowStockItems.length > 0) {
-        // Fetch current user and dummy/live financials for calculation
-        const userProfile = { 
-            name: document.getElementById('user-profile-name')?.innerText || "Stocknexa User", 
-            email: "client-email@example.com" // Populate with logged-in user email variable
-        };
+  saveData();
+  renderInventory();
+  refreshDashboard();
+  renderAlerts();
+  clearInvForm();
 
-        const financialData = {
-            revenue: 15000.00,  // Pull from your actual sales data/variables if available
-            cogs: 4500.00,
-            losses: 250.00,
-            refunds: 150.00,
-            overheads: 800.00,
-            topProduct: name || "Premium Widget",
-            topProductProfit: 3200.00,
-            underProduct: "Faulty Item",
-            underProductLoss: 120.00
-        };
+  // Check low stock and send email alert safely
+  checkLowStockAlerts();
+}
 
-        // Fire the template builder exactly as requested
-        sendLowStockBusinessAlert(userProfile, lowStockItems, financialData);
-    }
- 
-// Stocknexa Automated Email Notification System
+function checkLowStockAlerts() {
+  const lowStockItems = inventory
+    .filter(item => item.qty <= (item.threshold || 10))
+    .map(item => ({ name: item.name, stock: item.qty }));
+
+  if (lowStockItems.length > 0 && userProfile) {
+    const totalRev    = sales.reduce((a, s) => a + (s.revenue || 0), 0);
+    const totalCost   = sales.reduce((a, s) => a + (s.totalCost || 0), 0);
+    
+    const financialData = {
+      revenue: totalRev,
+      cogs: totalCost,
+      losses: 0,
+      refunds: 0,
+      overheads: 0,
+      topProduct: sales.length > 0 ? sales[0].product : "N/A",
+      topProductProfit: sales.length > 0 ? sales[0].profit : 0,
+      underProduct: "None",
+      underProductLoss: 0
+    };
+
+    sendLowStockBusinessAlert(userProfile, lowStockItems, financialData);
+  }
+}
 
 /**
- * Generates the text template and sends the low-stock alert via EmailJS
- * @param {Object} userProfile - The logged-in user data
- * @param {Array} lowStockProducts - Array of products with stock <= 10
- * @param {Object} financialData - Calculated weekly financial metrics
+ * Generates email template and safely sends low-stock alert via EmailJS if configured
  */
-function sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData) {
-    // 1. Calculate Reporting Dates
-    const today = new Date();
-    const firstDay = new Date(today.setDate(today.getDate() - today.getDay() + 1)); // Monday
-    const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 7));  // Sunday
-    
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const startDate = firstDay.toLocaleDateString('en-US', options);
-    const endDate = lastDay.toLocaleDateString('en-US', options);
+function sendLowStockBusinessAlert(profile, lowStockProducts, financialData) {
+  if (typeof emailjs === 'undefined') return;
 
-    // 2. Safely Build the ASCII Data Table Layout
-    let tableRows = "";
-    lowStockProducts.forEach(prod => {
-        // Pad the product name to fit perfectly inside the 25-character space
-        const namePart = `│ ${prod.name.padEnd(23, ' ')} `;
-        // Pad the units count to fit perfectly inside the 15-character space
-        const stockPart = `│ ${(prod.stock + " units").padEnd(14, ' ')}│`;
-        tableRows += namePart + stockPart + "\n";
-    });
-    // Remove the trailing newline character
-    tableRows = tableRows.trimEnd();
+  const today = new Date();
+  const firstDay = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+  const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 7));
+  
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const startDate = firstDay.toLocaleDateString('en-US', options);
+  const endDate = lastDay.toLocaleDateString('en-US', options);
 
-    // 3. Format Currency Numbers to 2 Decimal Places (GHS)
-    const formatGHS = (num) => Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  let tableRows = "";
+  lowStockProducts.forEach(prod => {
+    const namePart = `│ ${prod.name.padEnd(23, ' ')} `;
+    const stockPart = `│ ${(prod.stock + " units").padEnd(14, ' ')}│`;
+    tableRows += namePart + stockPart + "\n";
+  });
+  tableRows = tableRows.trimEnd();
 
-    const revenue = formatGHS(financialData.revenue);
-    const cogs = formatGHS(financialData.cogs);
-    const netProfit = formatGHS(financialData.revenue - financialData.cogs);
-    const losses = formatGHS(financialData.losses);
-    const refunds = formatGHS(financialData.refunds);
-    const overheads = formatGHS(financialData.overheads);
-    const netLoss = formatGHS(financialData.losses + financialData.refunds + financialData.overheads);
-    
-    const overallNetNum = (financialData.revenue - financialData.cogs) - (financialData.losses + financialData.refunds + financialData.overheads);
-    const overallNetPosition = formatGHS(overallNetNum);
-    const status = overallNetNum >= 0 ? "Profitable" : "At a Loss";
+  const sym = settings.currency || 'GH₵';
+  const formatCurr = (num) => Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 4. Construct the Template Structure Exactly
-    const emailBody = `Dear ${userProfile.name},
+  const revenue = formatCurr(financialData.revenue);
+  const cogs = formatCurr(financialData.cogs);
+  const netProfit = formatCurr(financialData.revenue - financialData.cogs);
 
-We hope this message finds you well. Here is your automated weekly business alert covering your inventory status and financial performance for the week of ${startDate} – ${endDate}.
+  const emailBody = `Dear ${profile.fullName || profile.name || 'Merchant'},
+
+Here is your automated Stocknexa inventory & business alert for ${startDate} – ${endDate}.
 
 ─────────────────────────────────
 🔴 LOW STOCK ALERT
 ─────────────────────────────────
-The following products have fallen to or below the critical threshold of 10 units. Immediate restocking is recommended to avoid stockouts.
+The following products have fallen to or below critical threshold:
 
 ┌─────────────────────────┬───────────────┐
 │ Product Name            │ Units in Stock │
@@ -531,69 +606,47 @@ The following products have fallen to or below the critical threshold of 10 unit
 ${tableRows}
 └─────────────────────────┴───────────────┘
 
-Please log in to your dashboard to reorder or update inventory levels.
+Please log in to your dashboard to restock: https://stocknexaai.netlify.app/
 
 ─────────────────────────────────
-📈 WEEKLY PROFIT SUMMARY
+📈 PROFIT SUMMARY
 ─────────────────────────────────
-Total Revenue This Week: GHS ${revenue}
-Total Cost of Goods Sold: GHS ${cogs}
-──────────────
-Net Profit: GHS ${netProfit} ✅
-Top Performing Product: ${financialData.topProduct} — GHS ${formatGHS(financialData.topProductProfit)} in profit
-
-─────────────────────────────────
-📉 WEEKLY LOSS SUMMARY
-─────────────────────────────────
-Total Recorded Losses: GHS ${losses}
-Returns & Refunds: GHS ${refunds}
-Expenses & Overheads: GHS ${overheads}
-──────────────
-Net Loss: GHS ${netLoss} ❌
-Underperforming Product: ${financialData.underProduct} — GHS ${formatGHS(financialData.underProductLoss)} in loss
-
-─────────────────────────────────
-📊 WEEKLY OVERVIEW
-─────────────────────────────────
-Overall Net Position: GHS ${overallNetPosition}
-Status: ${status}
-
-─────────────────────────────────
-For a full breakdown, please visit your dashboard at https://stocknexaai.netlify.app/auth.html.
-
-If you have any questions or concerns, feel free to reach out to our support team at support@stocknexa.com.
+Total Revenue: ${sym} ${revenue}
+Cost of Goods Sold: ${sym} ${cogs}
+Net Profit: ${sym} ${netProfit}
 
 Best regards,
-Stocknexa Automated Alerts
-──────────────────────────────────────────
-You are receiving this email because you are a registered user of Stocknexa. To manage your notification preferences, click here: https://stocknexaai.netlify.app/auth.html`;
+Stocknexa Automated Alerts`;
 
-    // 5. Send via EmailJS to protect your alerts@stocknexa.com credentials
-    // Sign up for free at emailjs.com, connect your SMTP/Gmail account, and paste keys below
-    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        to_email: userProfile.email,
-        to_name: userProfile.name,
-        message_body: emailBody
-    }, "YOUR_PUBLIC_KEY")
+  // Safely trigger EmailJS only if real public key and service IDs are configured
+  if (window.EMAILJS_SERVICE_ID && window.EMAILJS_TEMPLATE_ID && window.EMAILJS_PUBLIC_KEY) {
+    emailjs.send(window.EMAILJS_SERVICE_ID, window.EMAILJS_TEMPLATE_ID, {
+      to_email: profile.email,
+      to_name: profile.fullName || profile.name,
+      message_body: emailBody
+    }, window.EMAILJS_PUBLIC_KEY)
     .then(() => {
-        console.log("Stocknexa notification delivered successfully!");
+      console.log("Stocknexa email notification sent!");
     })
     .catch((error) => {
-        console.error("Technical issue sending email:", error);
+      console.warn("EmailJS notification skipped/failed:", error);
     });
-}
-  saveData(); renderInventory(); refreshDashboard(); renderAlerts(); clearInvForm();
+  }
 }
 
 function renderInventory(filter = 'all') {
   const grid = document.getElementById('inventory-grid');
-  const sym  = settings.currency;
+  if (!grid) return;
+
+  const sym = settings.currency || 'GH₵';
   const items = filter === 'low'
     ? inventory.filter(i => i.qty <= i.threshold)
     : inventory;
 
-  document.getElementById('inv-count-label').textContent =
-    `${inventory.length} item${inventory.length !== 1 ? 's' : ''} tracked`;
+  const countLabel = document.getElementById('inv-count-label');
+  if (countLabel) {
+    countLabel.textContent = `${inventory.length} item${inventory.length !== 1 ? 's' : ''} tracked`;
+  }
 
   if (items.length === 0) {
     grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
@@ -654,7 +707,7 @@ function renderInventory(filter = 'all') {
         ${item.cost > 0 ? `
         <div class="inv-stat">
           <div class="inv-stat-label">Unit Cost</div>
-          <div class="inv-stat-value">${sym}${item.cost.toFixed(2)}</div>
+          <div class="inv-stat-value">${sym}${(item.cost).toFixed(2)}</div>
         </div>
         <div class="inv-stat">
           <div class="inv-stat-label">Stock Value</div>
@@ -680,45 +733,49 @@ function restockItem(id) {
   if (!item) return;
 
   const amt = prompt(`How many units to add to "${item.name}"? (Current: ${item.qty})`);
-  const n   = parseFloat(amt);
+  if (amt === null) return;
+  const n = parseFloat(amt);
   if (isNaN(n) || n <= 0) { toast('Invalid quantity', 'error'); return; }
 
   item.qty += n;
-  saveData(); renderInventory(); refreshDashboard(); renderAlerts();
+  saveData();
+  renderInventory();
+  refreshDashboard();
+  renderAlerts();
   toast(`${item.name} restocked (+${n} units → ${item.qty} total)`, 'success');
 }
 
 function deleteInvItem(id) {
   if (!confirm('Remove this item from inventory?')) return;
   inventory = inventory.filter(i => i.id !== id);
-  saveData(); renderInventory(); refreshDashboard(); renderAlerts();
+  saveData();
+  renderInventory();
+  refreshDashboard();
+  renderAlerts();
   toast('Item removed', 'warn');
 }
 
 function clearAllInventory() {
   if (!confirm('Delete ALL inventory? This cannot be undone.')) return;
   inventory = [];
-  saveData(); renderInventory(); refreshDashboard(); renderAlerts();
+  saveData();
+  renderInventory();
+  refreshDashboard();
+  renderAlerts();
   toast('Inventory cleared', 'warn');
 }
 
 function clearInvForm() {
   ['i-name', 'i-qty', 'i-threshold', 'i-cost', 'i-expiry'].forEach(id => {
-    document.getElementById(id).value = '';
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
-  document.getElementById('i-category').value = 'General';
+  const catEl = document.getElementById('i-category');
+  if (catEl) catEl.value = 'General';
 }
 
 function filterInv(type) {
   renderInventory(type);
-}
-function logout() {
-  // Clear all stored data
-  localStorage.clear();
-  sessionStorage.clear();
-  
-  // Redirect to auth page
-  window.location.href = 'auth.html';
 }
 
 // ═══════════════════════════════════════════════
@@ -773,12 +830,20 @@ function getAlerts() {
 
 function renderAlerts() {
   const container = document.getElementById('alerts-list');
-  const alerts    = getAlerts();
+  if (!container) return;
+
+  const alerts = getAlerts();
 
   // Update badge
   const badge = document.getElementById('alert-badge');
-  if (alerts.length > 0) { badge.style.display = 'inline'; badge.textContent = alerts.length; }
-  else                   { badge.style.display = 'none'; }
+  if (badge) {
+    if (alerts.length > 0) {
+      badge.style.display = 'inline';
+      badge.textContent = alerts.length;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 
   if (alerts.length === 0) {
     container.innerHTML = `<div class="empty">
@@ -806,14 +871,16 @@ function renderAlerts() {
 function dismissAlert(id) {
   dismissedAlerts.push(id);
   localStorage.setItem('smartretail_dismissed', JSON.stringify(dismissedAlerts));
-  renderAlerts(); refreshDashboard();
+  renderAlerts();
+  refreshDashboard();
 }
 
 function dismissAllAlerts() {
   const alerts = getAlerts();
   alerts.forEach(a => dismissedAlerts.push(a.id));
   localStorage.setItem('smartretail_dismissed', JSON.stringify(dismissedAlerts));
-  renderAlerts(); refreshDashboard();
+  renderAlerts();
+  refreshDashboard();
   toast('All alerts dismissed', 'success');
 }
 
@@ -827,13 +894,19 @@ function saveSettings(silent = false) {
   if (currEl) settings.currency  = currEl.value || settings.currency;
 
   localStorage.setItem('smartretail_settings', JSON.stringify(settings));
-  applySettings(); refreshDashboard(); renderLedger(); renderInventory();
+  applySettings();
+  refreshDashboard();
+  renderLedger();
+  renderInventory();
   if (!silent) toast('Settings saved!', 'success');
 }
 
 function resetAll() {
   if (!confirm('⚠️ FULL RESET: Delete ALL data including sales, inventory, and settings? This cannot be undone.')) return;
-  localStorage.clear();
+  localStorage.removeItem('smartretail_sales');
+  localStorage.removeItem('smartretail_inventory');
+  localStorage.removeItem('smartretail_settings');
+  localStorage.removeItem('smartretail_dismissed');
   location.reload();
 }
 
@@ -850,11 +923,13 @@ function saveData() {
 // ═══════════════════════════════════════════════
 function toast(msg, type = 'success') {
   const container = document.getElementById('toast');
-  const icons     = { success: '✅', error: '❌', warn: '⚠️' };
+  if (!container) return;
+
+  const icons = { success: '✅', error: '❌', warn: '⚠️' };
 
   const el = document.createElement('div');
   el.className = `toast-item ${type}`;
-  el.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
+  el.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${esc(msg)}</span>`;
   container.appendChild(el);
 
   setTimeout(() => {
@@ -866,12 +941,6 @@ function toast(msg, type = 'success') {
 // ═══════════════════════════════════════════════
 //  UTILITIES
 // ═══════════════════════════════════════════════
-
-/**
- * Escape HTML special characters to prevent XSS
- * @param {string} str
- * @returns {string}
- */
 function esc(str) {
   if (!str) return '';
   return String(str)
@@ -884,149 +953,7 @@ function esc(str) {
 // ═══════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════
-init();
-
-// ==========================================
-// PASTE THE MAIN FUNCTION HERE (At the bottom of app.js)
-// ==========================================
-function sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData) {
-    // ... (This is the long function from the previous answer)
-    // ... It handles the layout, dates, and ends with emailjs.send()
-}
-
-
-// ==========================================
-// PASTE THE EXECUTION SETUP CODE IMMEDIATELY BELOW IT
-// ==========================================
-// Place this inside the function where your app handles product sales, 
-// stock updates, or page loading. 
-function checkInventoryAndNotify() {
-    // 1. Your sample or active data arrays
-    const userProfile = { name: "Kwame Mensah", email: "kwame@mensahstores.com" };
-
-    const lowStockProducts = [
-        { name: "Product A", stock: 8 },
-        { name: "Product B", stock: 5 },
-        { name: "Product C", stock: 10 }
-    ];
-
-    const financialData = {
-        revenue: 15000.00,
-        cogs: 4500.00,
-        losses: 250.00,
-        refunds: 150.00,
-        overheads: 800.00,
-        topProduct: "Premium Widget",
-        topProductProfit: 3200.00,
-        underProduct: "Faulty Gadget",
-        underProductLoss: 400.00
-    };
-
-    // 2. The trigger logic that automatically fires the email
-    if (lowStockProducts.length > 0) {
-        sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData);
-    }
-}
-
-// Call this function whenever you want to test or run the alert system
-// checkInventoryAndNotify();
-
-// =========================================================================
-// AUTOMATED EMAIL NOTIFICATION SYSTEM (PASTE AT THE VERY END OF APP.JS)
-// =========================================================================
-function sendLowStockBusinessAlert(userProfile, lowStockProducts, financialData) {
-    const today = new Date();
-    const firstDay = new Date(today.setDate(today.getDate() - today.getDay() + 1)); 
-    const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 7));  
-    
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const startDate = firstDay.toLocaleDateString('en-US', options);
-    const endDate = lastDay.toLocaleDateString('en-US', options);
-
-    let tableRows = "";
-    lowStockProducts.forEach(prod => {
-        const namePart = `│ ${prod.name.padEnd(23, ' ')} `;
-        const stockPart = `│ ${(prod.stock + " units").padEnd(14, ' ')}│`;
-        tableRows += namePart + stockPart + "\n";
-    });
-    tableRows = tableRows.trimEnd();
-
-    const formatGHS = (num) => Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    const revenue = formatGHS(financialData.revenue);
-    const cogs = formatGHS(financialData.cogs);
-    const netProfit = formatGHS(financialData.revenue - financialData.cogs);
-    const losses = formatGHS(financialData.losses);
-    const refunds = formatGHS(financialData.refunds);
-    const overheads = formatGHS(financialData.overheads);
-    const netLoss = formatGHS(financialData.losses + financialData.refunds + financialData.overheads);
-    
-    const overallNetNum = (financialData.revenue - financialData.cogs) - (financialData.losses + financialData.refunds + financialData.overheads);
-    const overallNetPosition = formatGHS(overallNetNum);
-    const status = overallNetNum >= 0 ? "Profitable" : "At a Loss";
-
-    const emailBody = `Dear ${userProfile.name},
-
-We hope this message finds you well. Here is your automated weekly business alert covering your inventory status and financial performance for the week of ${startDate} – ${endDate}.
-
-─────────────────────────────────
-🔴 LOW STOCK ALERT
-─────────────────────────────────
-The following products have fallen to or below the critical threshold of 10 units. Immediate restocking is recommended to avoid stockouts.
-
-┌─────────────────────────┬───────────────┐
-│ Product Name            │ Units in Stock │
-├─────────────────────────┼───────────────┤
-${tableRows}
-└─────────────────────────┴───────────────┘
-
-Please log in to your dashboard to reorder or update inventory levels.
-
-─────────────────────────────────
-📈 WEEKLY PROFIT SUMMARY
-─────────────────────────────────
-Total Revenue This Week: GHS ${revenue}
-Total Cost of Goods Sold: GHS ${cogs}
-──────────────
-Net Profit: GHS ${netProfit} ✅
-Top Performing Product: ${financialData.topProduct} — GHS ${formatGHS(financialData.topProductProfit)} in profit
-
-─────────────────────────────────
-📉 WEEKLY LOSS SUMMARY
-─────────────────────────────────
-Total Recorded Losses: GHS ${losses}
-Returns & Refunds: GHS ${refunds}
-Expenses & Overheads: GHS ${overheads}
-──────────────
-Net Loss: GHS ${netLoss} ❌
-Underperforming Product: ${financialData.underProduct} — GHS ${formatGHS(financialData.underProductLoss)} in loss
-
-─────────────────────────────────
-📊 WEEKLY OVERVIEW
-─────────────────────────────────
-Overall Net Position: GHS ${overallNetPosition}
-Status: ${status}
-
-─────────────────────────────────
-For a full breakdown, please visit your dashboard at https://stocknexaai.netlify.app/auth.html.
-
-If you have any questions or concerns, feel free to reach out to our support team at support@stocknexa.com.
-
-Best regards,
-Stocknexa Automated Alerts
-──────────────────────────────────────────
-You are receiving this email because you are a registered user of Stocknexa. To manage your notification preferences, click here: https://stocknexaai.netlify.app/auth.html`;
-
-    // Make sure to replace these placeholder strings with your actual keys from emailjs.com
-    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        to_email: userProfile.email,
-        to_name: userProfile.name,
-        message_body: emailBody
-    }, "YOUR_PUBLIC_KEY")
-    .then(() => {
-        console.log("Stocknexa notification delivered successfully!");
-    })
-    .catch((error) => {
-        console.error("Technical issue sending email:", error);
-    });
+document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  init();
 }

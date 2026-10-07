@@ -368,10 +368,13 @@
 <!-- MOBILE NAV -->
 <nav id="mobile-nav" aria-label="Mobile navigation">
   <button class="mobile-nav-item active" onclick="showSection('dashboard',this);setMobileActive(this)">
-    <span class="m-icon">📊</span>Home
+    <span class="m-icon">📊</span>Dashboard
   </button>
   <button class="mobile-nav-item" onclick="showSection('sales',this);setMobileActive(this)">
     <span class="m-icon">💰</span>Sale
+  </button>
+  <button class="mobile-nav-item" onclick="showSection('ledger',this);setMobileActive(this)">
+    <span class="m-icon">📋</span>Ledger
   </button>
   <button class="mobile-nav-item" onclick="showSection('inventory',this);setMobileActive(this)">
     <span class="m-icon">📦</span>Stock
@@ -382,19 +385,6 @@
   <button class="mobile-nav-item" onclick="showSection('settings',this);setMobileActive(this)">
     <span class="m-icon">⚙️</span>Settings
   </button>
-</nav>
- <!-- MOBILE NAV -->
-<nav id="mobile-nav" aria-label="Mobile navigation">
-  <button class="mobile-nav-item active" onclick="showSection('home')">
-    <span class="m-icon">🏠</span>Home
-  </button>
-  <button class="mobile-nav-item" onclick="showSection('sale')">
-    <span class="m-icon">🛍️</span>Sale
-  </button>
-  <!-- ... other buttons ... -->
-   <button class="mobile-nav-item logout-btn" onclick="logout()">
-  <span class="m-icon">🚪</span>Logout
-</button>
 </nav>
 
 <!-- TOAST CONTAINER -->
